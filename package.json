@@ -1,0 +1,25 @@
+{
+  "name": "homebridge-onkyo-tv",
+  "version": "0.0.1",
+  "description": "Homebridge plugin for Onkyo Receivers",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gcordalis/homebridge-onkyo-tv.git"
+  },
+  "keywords": [
+    "homebridge",
+    "homebridge-plugin",
+    "homekit",
+    "onkyo"
+  ],
+  "author": "gcordalis",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gcordalis/homebridge-onkyo-tv/issues"
+  },
+  "homepage": "https://github.com/gcordalis/homebridge-onkyo-tv#readme"
+}
