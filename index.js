@@ -466,53 +466,29 @@ onkyoAccessory.prototype.remoteKeyPress = function(remoteKey, callback) {
   this.log.debug("Onkyo - remote key pressed: %d", remoteKey);
 
   switch (remoteKey) {
-    case Characteristic.RemoteKey.REWIND:
-      this.setRemoteControlButtonState(true, callback, "REWIND");
-      break;
-    case Characteristic.RemoteKey.FAST_FORWARD:
-      this.setRemoteControlButtonState(true, callback, "FASTFORWARD");
-      break;
-    case Characteristic.RemoteKey.NEXT_TRACK:
-      // does a endpoint call exist?
-      this.log.info("webOS - next track remote key not supported");
-      callback();
-      break;
-    case Characteristic.RemoteKey.PREVIOUS_TRACK:
-      // does a endpoint call exist?
-      this.log.info("webOS - previous track remote key not supported");
-      callback();
-      break;
     case Characteristic.RemoteKey.ARROW_UP:
-      this.setRemoteControlButtonState(true, callback, "UP");
+      log("UP");
       break;
     case Characteristic.RemoteKey.ARROW_DOWN:
-      this.setRemoteControlButtonState(true, callback, "DOWN");
+      log("DOWN");
       break;
     case Characteristic.RemoteKey.ARROW_LEFT:
-      this.setRemoteControlButtonState(true, callback, "LEFT");
+      log("LEFT");
       break;
     case Characteristic.RemoteKey.ARROW_RIGHT:
-      this.setRemoteControlButtonState(true, callback, "RIGHT");
+      log("RIGHT");
       break;
     case Characteristic.RemoteKey.SELECT:
-      this.setRemoteControlButtonState(true, callback, "ENTER");
+      log("ENTER");
       break;
     case Characteristic.RemoteKey.BACK:
-      this.setRemoteControlButtonState(true, callback, "BACK");
+      log("BACK");
       break;
     case Characteristic.RemoteKey.EXIT:
-      this.setRemoteControlButtonState(true, callback, "EXIT");
-      break;
-    case Characteristic.RemoteKey.PLAY_PAUSE:
-      if (this.isPaused) {
-        this.setRemoteControlButtonState(true, callback, "PLAY");
-      } else {
-        this.setRemoteControlButtonState(true, callback, "PAUSE");
-      }
-      this.isPaused = !this.isPaused;
+      log("EXIT");
       break;
     case Characteristic.RemoteKey.INFORMATION:
-      this.setRemoteControlButtonState(true, callback, "INFO");
+      log("INFO");
       break;
   }
 };
