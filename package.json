@@ -21,5 +21,11 @@
   "bugs": {
     "url": "https://github.com/gcordalis/homebridge-onkyo-tv/issues"
   },
-  "homepage": "https://github.com/gcordalis/homebridge-onkyo-tv#readme"
+  "homepage": "https://github.com/gcordalis/homebridge-onkyo-tv#readme",
+  "dependencies": {
+    "eiscp": "git://github.com/gcordalis/node-eiscp.git"
+  },
+  "engines": {
+    "homebridge": ">=0.4.46"
+  }
 }
