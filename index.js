@@ -25,6 +25,7 @@ function onkyoAccessory(log, config) {
   this.powerState = false;
   this.tvVolume = 0;
   this.currentInput = "";
+  this.remoteControlButtons = ["MENU", "BACK", "VOLUMEUP", "VOLUMEDOWN"];
 
   var that = this;
   this.services = [];
@@ -66,6 +67,11 @@ function onkyoAccessory(log, config) {
   // All inputs for the Onkyo TX-NR575E
   this.defaultInputs = [
     {
+      code: "SLI11",
+      name: "STRM BOX",
+      type: Characteristic.InputSourceType.HDMI
+    },
+    {
       code: "SLI01",
       name: "CBL / SAT",
       type: Characteristic.InputSourceType.HDMI
@@ -91,11 +97,6 @@ function onkyoAccessory(log, config) {
       type: Characteristic.InputSourceType.HDMI
     },
     {
-      code: "SLI11",
-      name: "STRM BOX",
-      type: Characteristic.InputSourceType.HDMI
-    },
-    {
       code: "SLI22",
       name: "PHONO",
       type: Characteristic.InputSourceType.AUDIO_SYSTEM
@@ -118,17 +119,17 @@ function onkyoAccessory(log, config) {
     {
       code: "SLI29",
       name: "USB",
-      type: Characteristic.InputSourceType.OTHER
+      type: Characteristic.InputSourceType.USB
     },
     {
       code: "SLI2B",
       name: "NETWORK",
-      type: Characteristic.InputSourceType.OTHER
+      type: Characteristic.InputSourceType.AIRPLAY
     }
   ];
 
   this.inputAppIds = new Array();
-  // predefined inputs
+
   this.defaultInputs.forEach((value, i) => {
     let tmpDefaultSource = new Service.InputSource(
       value.name,
@@ -239,62 +240,52 @@ function onkyoAccessory(log, config) {
           }
         }
         log("Input State -", this.currentInput);
+        this.setCurrentInput;
         break;
     }
   });
-
-  // ****************************************************************************************************
-  // ********** This is for testing remote functionality in the future  *********************************
-  // ****************************************************************************************************
 
   this.service
     .getCharacteristic(Characteristic.RemoteKey)
     .on("set", function(newValue, callback) {
       switch (newValue) {
         case 4:
-          code = "AAAAAQAAAAEAAAB0Aw==";
-          log(code);
+          eiscp.raw("OSDUP");
+          log("Onkyo - remote control service - UP");
           break;
         case 5:
-          code = "AAAAAQAAAAEAAAB1Aw==";
-          log(code);
+          eiscp.raw("OSDDOWN");
+          log("Onkyo - remote control service - DOWN");
           break;
         case 6:
-          code = "AAAAAQAAAAEAAAA0Aw==";
-          log(code);
+          eiscp.raw("OSDLEFT");
+          log("Onkyo - remote control service - LEFT");
           break;
         case 7:
-          code = "AAAAAQAAAAEAAAAzAw==";
-          log(code);
+          eiscp.raw("OSDRIGHT");
+          log("Onkyo - remote control service - RIGHT");
           break;
         case 8:
-          code = "AAAAAQAAAAEAAABlAw==";
-          log(code);
+          eiscp.raw("OSDENTER");
+          log("Onkyo - remote control service - ENTER");
           break;
         case 9:
-          code = "AAAAAgAAAJcAAAAjAw==";
-          log(code);
-          break;
-        case 15:
-          code = "AAAAAQAAAAEAAABgAw==";
-          log(code);
+          eiscp.raw("OSDEXIT");
+          log("Onkyo - remote control service - EXIT");
           break;
         case 10:
-          code = "AAAAAgAAAJcAAAAYAw==";
-          log(code);
+          button = "INFO BUTTON"; // INFO BUTTON
+          log(button);
           break;
         case 11:
-          code = "AAAAAgAAAJcAAAAaAw==";
-          log(code);
+          button = "PLAY/PAUSE"; // PLAY/PAUSE
+          log(button);
           break;
       }
 
-      xmlcode = code;
-      log(code);
       callback(null);
     });
 }
-
 // SETUP SERICES
 
 onkyoAccessory.prototype.prepareInformationService = function() {
@@ -338,6 +329,49 @@ onkyoAccessory.prototype.prepareTvSpeakerService = function() {
     .on("set", this.setVolume.bind(this));
 
   this.services.push(this.tvSpeakerService);
+};
+
+onkyoAccessory.prototype.prepareRemoteControlButtonService = function() {
+  if (
+    this.remoteControlButtons == undefined ||
+    this.remoteControlButtons == null ||
+    this.remoteControlButtons.length <= 0
+  ) {
+    return;
+  }
+
+  if (Array.isArray(this.remoteControlButtons) == false) {
+    this.remoteControlButtons = [this.remoteControlButtons];
+  }
+
+  this.remoteControlButtonService = new Array();
+  this.remoteControlButtons.forEach((value, i) => {
+    this.remoteControlButtons[i] = this.remoteControlButtons[i]
+      .toString()
+      .toUpperCase();
+    let tmpRemoteControl = new Service.Switch(
+      this.name + " RC: " + value,
+      "remoteControlButtonService" + i
+    );
+    tmpRemoteControl
+      .getCharacteristic(Characteristic.On)
+      .on("get", callback => {
+        this.getRemoteControlButtonState(
+          callback,
+          this.remoteControlButtons[i]
+        );
+      })
+      .on("set", (state, callback) => {
+        this.setRemoteControlButtonState(
+          state,
+          callback,
+          this.remoteControlButtons[i]
+        );
+      });
+
+    this.services.push(tmpRemoteControl);
+    // this.remoteControlButtonService.push(tmpRemoteControl);
+  });
 };
 
 // POWER
@@ -433,87 +467,6 @@ onkyoAccessory.prototype.setVolumeSwitch = function(state, callback, isUp) {
     callback(
       new Error("Onkyo - volume service - is not connected, cannot set volume")
     );
-  }
-};
-
-// ****************************************************************************************************
-// ********** This is for testing remote functionality in the future  *********************************
-// ****************************************************************************************************
-
-// REMOTE CONTROL
-
-onkyoAccessory.prototype.getRemoteControlButtonState = function(callback) {
-  callback(null, false);
-};
-
-onkyoAccessory.prototype.setRemoteControlButtonState = function(
-  state,
-  callback,
-  rcButton
-) {
-  if (rcButton === "CLICK") {
-    this.log.debug(
-      "Onkyo - remote control button service - emulating remote control %s press",
-      rcButton
-    );
-  } else {
-    log("NOT CLICK");
-  }
-  callback();
-};
-
-onkyoAccessory.prototype.remoteKeyPress = function(remoteKey, callback) {
-  this.log.debug("Onkyo - remote key pressed: %d", remoteKey);
-
-  switch (remoteKey) {
-    case Characteristic.RemoteKey.REWIND:
-      this.setRemoteControlButtonState(true, callback, "REWIND");
-      break;
-    case Characteristic.RemoteKey.FAST_FORWARD:
-      this.setRemoteControlButtonState(true, callback, "FASTFORWARD");
-      break;
-    case Characteristic.RemoteKey.NEXT_TRACK:
-      // does a endpoint call exist?
-      this.log.info("webOS - next track remote key not supported");
-      callback();
-      break;
-    case Characteristic.RemoteKey.PREVIOUS_TRACK:
-      // does a endpoint call exist?
-      this.log.info("webOS - previous track remote key not supported");
-      callback();
-      break;
-    case Characteristic.RemoteKey.ARROW_UP:
-      this.setRemoteControlButtonState(true, callback, "UP");
-      break;
-    case Characteristic.RemoteKey.ARROW_DOWN:
-      this.setRemoteControlButtonState(true, callback, "DOWN");
-      break;
-    case Characteristic.RemoteKey.ARROW_LEFT:
-      this.setRemoteControlButtonState(true, callback, "LEFT");
-      break;
-    case Characteristic.RemoteKey.ARROW_RIGHT:
-      this.setRemoteControlButtonState(true, callback, "RIGHT");
-      break;
-    case Characteristic.RemoteKey.SELECT:
-      this.setRemoteControlButtonState(true, callback, "ENTER");
-      break;
-    case Characteristic.RemoteKey.BACK:
-      this.setRemoteControlButtonState(true, callback, "BACK");
-      break;
-    case Characteristic.RemoteKey.EXIT:
-      this.setRemoteControlButtonState(true, callback, "EXIT");
-      break;
-    case Characteristic.RemoteKey.PLAY_PAUSE:
-      if (this.isPaused) {
-        this.setRemoteControlButtonState(true, callback, "PLAY");
-      } else {
-        this.setRemoteControlButtonState(true, callback, "PAUSE");
-      }
-      this.isPaused = !this.isPaused;
-      break;
-    case Characteristic.RemoteKey.INFORMATION:
-      this.setRemoteControlButtonState(true, callback, "INFO");
-      break;
   }
 };
 
