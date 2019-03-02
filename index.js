@@ -470,8 +470,6 @@ onkyoAccessory.prototype.setVolumeSwitch = function(state, callback, isUp) {
   }
 };
 
-<<<<<<< HEAD
-=======
 // ****************************************************************************************************
 // ********** This is for testing remote functionality in the future  *********************************
 // ****************************************************************************************************
@@ -529,7 +527,6 @@ onkyoAccessory.prototype.remoteKeyPress = function(remoteKey, callback) {
   }
 };
 
->>>>>>> 1f330b63ab577275b1a266ef8e73df31be720ca9
 // RUN SERVICE
 
 onkyoAccessory.prototype.getServices = function() {
