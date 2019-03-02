@@ -1,8 +1,6 @@
 var Service, Characteristic, VolumeCharacteristic;
 var eiscp = require("eiscp");
 
-// Test
-
 module.exports = function(homebridge) {
   Service = homebridge.hap.Service;
   Characteristic = homebridge.hap.Characteristic;
