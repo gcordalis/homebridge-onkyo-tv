@@ -470,6 +470,66 @@ onkyoAccessory.prototype.setVolumeSwitch = function(state, callback, isUp) {
   }
 };
 
+<<<<<<< HEAD
+=======
+// ****************************************************************************************************
+// ********** This is for testing remote functionality in the future  *********************************
+// ****************************************************************************************************
+
+// REMOTE CONTROL
+
+onkyoAccessory.prototype.getRemoteControlButtonState = function(callback) {
+  callback(null, false);
+};
+
+onkyoAccessory.prototype.setRemoteControlButtonState = function(
+  state,
+  callback,
+  rcButton
+) {
+  if (rcButton === "CLICK") {
+    this.log.debug(
+      "Onkyo - remote control button service - emulating remote control %s press",
+      rcButton
+    );
+  } else {
+    log("NOT CLICK");
+  }
+  callback();
+};
+
+onkyoAccessory.prototype.remoteKeyPress = function(remoteKey, callback) {
+  this.log.debug("Onkyo - remote key pressed: %d", remoteKey);
+
+  switch (remoteKey) {
+    case Characteristic.RemoteKey.ARROW_UP:
+      log("UP");
+      break;
+    case Characteristic.RemoteKey.ARROW_DOWN:
+      log("DOWN");
+      break;
+    case Characteristic.RemoteKey.ARROW_LEFT:
+      log("LEFT");
+      break;
+    case Characteristic.RemoteKey.ARROW_RIGHT:
+      log("RIGHT");
+      break;
+    case Characteristic.RemoteKey.SELECT:
+      log("ENTER");
+      break;
+    case Characteristic.RemoteKey.BACK:
+      log("BACK");
+      break;
+    case Characteristic.RemoteKey.EXIT:
+      log("EXIT");
+      break;
+    case Characteristic.RemoteKey.INFORMATION:
+      log("INFO");
+      break;
+  }
+};
+
+>>>>>>> 1f330b63ab577275b1a266ef8e73df31be720ca9
 // RUN SERVICE
 
 onkyoAccessory.prototype.getServices = function() {
